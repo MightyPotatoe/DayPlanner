@@ -11,6 +11,10 @@ import com.example.dayplanner.R;
 
 public class SingleActionElement extends LinearLayout {
 
+    public SingleActionElement(Context context) {
+        super(context);
+    }
+
     public SingleActionElement(Context context, int imageId, String dateText, String activityName) {
         super(context);
         this.setOrientation(LinearLayout.VERTICAL);

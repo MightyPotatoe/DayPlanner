@@ -1,5 +1,6 @@
 package com.example.dayplanner.CustomViews;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Paint;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import com.example.dayplanner.R;
 
 
+@SuppressLint("ViewConstructor")
 public class TimeEventElement extends LinearLayout {
 
     final TextView activityTV;
