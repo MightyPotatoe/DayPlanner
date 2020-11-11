@@ -1,29 +1,18 @@
-package com.example.dayplanner;
+package com.example.dayplanner.CustomViews;
 
 import android.content.Context;
 import android.graphics.Paint;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.widget.AppCompatImageView;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import com.example.dayplanner.R;
 
-import com.example.dayplanner.databinding.TimeEventLayoutBinding;
 
 public class TimeEventElement extends LinearLayout {
 
-    TimeEventLayoutBinding binding;
-
-
-    public TimeEventElement(Context context) {
-        super(context);
-    }
+    final TextView activityTV;
 
     public TimeEventElement(Context context, int imageId, String dateText, String activityName) {
         super(context);
@@ -38,7 +27,7 @@ public class TimeEventElement extends LinearLayout {
         final TextView hourTV = timeEventLayout.findViewById(R.id.hourTV);
         hourTV.setText(dateText);
 
-        final TextView activityTV = timeEventLayout.findViewById(R.id.valueTV);
+        activityTV = timeEventLayout.findViewById(R.id.valueTV);
         activityTV.setText(activityName);
 
         this.addView(timeEventLayout);
@@ -65,6 +54,9 @@ public class TimeEventElement extends LinearLayout {
         });
     }
 
+    public void setActivityText(String text){
+        activityTV.setText(text);
+    }
 
     public static boolean isStrikeThrough(TextView tv) {
         int flags = tv.getPaintFlags();

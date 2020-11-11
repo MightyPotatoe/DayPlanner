@@ -1,10 +1,12 @@
-package com.example.dayplanner;
+package com.example.dayplanner.CustomViews;
 
 import android.content.Context;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.dayplanner.R;
 
 public class LegendElement extends LinearLayout {
 

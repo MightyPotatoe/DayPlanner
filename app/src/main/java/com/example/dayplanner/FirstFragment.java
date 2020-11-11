@@ -6,18 +6,23 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
+
+import com.example.dayplanner.CustomViews.SingleActionElement;
+import com.example.dayplanner.CustomViews.TimeEventElement;
+import com.example.dayplanner.DataBase.AppDatabase;
+import com.example.dayplanner.DataBase.Category;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class FirstFragment extends Fragment {
 
-    private DatabaseHelper dbHelper;
 
     @Override
     public View onCreateView(
@@ -32,10 +37,12 @@ public class FirstFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        dbHelper = new DatabaseHelper(getContext());
+        //InitializingDb and perform fakeRead
+        final AppDatabase db = AppDatabase.getInstance(getContext());
 
 
         LinearLayout contentLayout = view.findViewById(R.id.contentLayout);
+
 
 
 
@@ -108,13 +115,23 @@ public class FirstFragment extends Fragment {
         TimeEventElement timeEventElement12 = new TimeEventElement(getContext(), R.drawable.sport_icon,"22:30", "Medytacja");
         contentLayout.addView(timeEventElement12);
 
-        TimeEventElement timeEventElement13 = new TimeEventElement(getContext(), R.drawable.sleep_icon,"23:00", "Spanko");
+        final TimeEventElement timeEventElement13 = new TimeEventElement(getContext(), R.drawable.sleep_icon,"23:00", "Spanko");
         contentLayout.addView(timeEventElement13);
 
 
         final ScrollView scrollView = view.findViewById(R.id.contentRelativeLayout);
         scrollView.bringToFront();
 
+
+
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                final AppDatabase db = AppDatabase.getInstance(getContext());
+                Category found = db.categoryDao().findByName("work".toUpperCase());
+                timeEventElement13.setActivityText(found.name);
+            }
+        });
 
     }
 
@@ -129,6 +146,18 @@ public class FirstFragment extends Fragment {
 
     public int dp(int dp){
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
+    }
+
+    public void awaitTerminationAfterShutdown(ExecutorService threadPool) {
+        threadPool.shutdown();
+        try {
+            if (!threadPool.awaitTermination(60, TimeUnit.SECONDS)) {
+                threadPool.shutdownNow();
+            }
+        } catch (InterruptedException ex) {
+            threadPool.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
 

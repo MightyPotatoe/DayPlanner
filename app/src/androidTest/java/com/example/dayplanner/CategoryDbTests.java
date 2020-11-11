@@ -2,12 +2,13 @@ package com.example.dayplanner;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.view.View;
 
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
+
+import com.example.dayplanner.DataBase.AppDatabase;
+import com.example.dayplanner.DataBase.Category;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,10 +16,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(AndroidJUnit4.class)
-public class DatabaseTestsCategory {
+public class CategoryDbTests {
 
     @Rule
     public ActivityTestRule<MainActivity> mainActivityActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -36,7 +36,7 @@ public class DatabaseTestsCategory {
     @Before
     public void setUp() throws InterruptedException {
         mainActivity = mainActivityActivityTestRule.getActivity();
-        mainActivity.getApplicationContext().deleteDatabase("day_planner.db");
+        mainActivity.getApplicationContext().deleteDatabase("day_planner_db");
         mainActivity = mainActivityActivityTestRule.getActivity();
         //zamkniecie aplikacji
         mainActivity.finish();
@@ -45,6 +45,7 @@ public class DatabaseTestsCategory {
     }
 
 
+    //-----------------TEST 1------------------------------
     @Test
     public void useAppContext() {
         // Context of the app under test.
@@ -52,49 +53,46 @@ public class DatabaseTestsCategory {
         assertEquals("com.example.dayplanner", appContext.getPackageName());
     }
 
+    //-----------------TEST 2------------------------------
     /**
      * 1) Uruchomienie aplikacji
      * 2) Sprawdzenie czy baza została wypełniona wartościami domyślnymi
      */
     @Test()
-    public void InicjalizowanieBazyDanych() {
-        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity.getBaseContext());
+    public void InicjalizowanieBazyDanych() throws InterruptedException {
+        final AppDatabase db = AppDatabase.getInstance(mainActivity.getBaseContext());
 
-        ArrayList<Category> basicCategoriesList = new BasicCategories().getCategoriesList();
-        for(Category category: basicCategoriesList){
-            Cursor cursor = dbHelper.getCategoryFromCategoryDB(category.NAME);
-            Assert.assertEquals(cursor.getString(DatabaseHelper.CATEGORIES_TABLE_CATEGORY_NAME_COL_INDEX), category.NAME);
+        //Sprawdzenie czy wszystkie pola zostały spredefiniowane w bazie
+        Category[] categories = Category.populateData();
+        List<Category> result = db.categoryDao().getAll();
+        for(int i = 0; i < categories.length; i++){
+            Assert.assertEquals(result.get(i), categories[i]);
         }
+
     }
 
+    //-----------------TEST 3------------------------------
     /**
      * Sprawdzenie czy kategoria istnieje
      */
     @Test()
     public void SprawdzenieCzyKategoriaZnajdujeSieNaLiscie(){
-        Category newCategory;
-
-        //-- 1) Kategoria znajduje się bazie wszystkie pola
-        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity.getBaseContext());
-        //Sprawdzenie czy podana kategoria istenieje w bazie danych
-        Assert.assertTrue(dbHelper.checkIfCategoryExists(BasicCategories.categoriesList.get(0)));
+        final AppDatabase db = AppDatabase.getInstance(mainActivity.getBaseContext());
+        final Category existingCategory = Category.populateData()[0];
+        //-- 1) Kategoria znajduje się w bazie wszystkie pola
+        assertEquals(1, db.categoryDao().checkForDuplicates(existingCategory.name, existingCategory.iconId, existingCategory.colorHex));
 
         //-- 2) Kategoria nie znajduje się w bazie - nazwa jako duplikat
-        newCategory = new Category(BasicCategories.categoriesList.get(0).NAME, 1, "RED");
-        Assert.assertTrue(dbHelper.checkIfCategoryExists(newCategory));
+        assertEquals(1, db.categoryDao().checkForDuplicates(existingCategory.name, 1, "x"));
 
         //-- 3) Kategoria nie znajduje się w bazie - ikona jako duplikat
-        newCategory = new Category( "NOWA KATEGORIA TESTOWA", BasicCategories.categoriesList.get(0).ICON_ID, "RED");
-        Assert.assertTrue(dbHelper.checkIfCategoryExists(newCategory));
+        assertEquals(1, db.categoryDao().checkForDuplicates("example", existingCategory.iconId, "x"));
 
         //-- 4) Kategoria nie znajduje się w bazie - kolor jako duplikat
-        newCategory = new Category( "NOWA KATEGORIA TESTOWA", 1, BasicCategories.categoriesList.get(0).COLOR);
-        Assert.assertTrue(dbHelper.checkIfCategoryExists(newCategory));
+        assertEquals(1, db.categoryDao().checkForDuplicates("secondExample", 2, existingCategory.colorHex));
 
         //-- 5) Kategoria nie znajduje się w bazie
-        newCategory = new Category("NOWA KATEGORIA TESTOWA", 1, "RED");
-        Assert.assertFalse(dbHelper.checkIfCategoryExists(newCategory));
-
+        assertEquals(0, db.categoryDao().checkForDuplicates("nonExist", 0, "xxx"));
     }
 
     /**
@@ -102,12 +100,15 @@ public class DatabaseTestsCategory {
      */
     @Test()
     public void DodanieKategoriiNieznajdujacejSieNaLiscie(){
-        DatabaseHelper dbHelper = new DatabaseHelper(mainActivity.getBaseContext());
-        Category newCategory = new Category("NOWA KATEGORIA TESTOWA", 1, "RED");
+        final AppDatabase db = AppDatabase.getInstance(mainActivity.getBaseContext());
+
+        Category category = new Category("Nowa Kategortia", 215452, "#FFFFFF");
         //Sprawdzenie czy podana kategoria istenieje w bazie danych
-        Assert.assertFalse(dbHelper.checkIfCategoryExists(newCategory));
+        assertEquals(0, db.categoryDao().checkForDuplicates("nonExist", 0, "xxx"));
         //Dodanie categorii do bazy
-        Assert.assertTrue(dbHelper.insertCategoryToDB(newCategory));
-        Assert.assertTrue(dbHelper.checkIfCategoryExists(newCategory));
+        db.categoryDao().insertAll(category);
+        //Weryfikacja czy kategoria została dodana
+        assertEquals(1, db.categoryDao().checkForDuplicates(category.name, category.iconId, category.colorHex));
     }
+
 }

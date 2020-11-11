@@ -1,13 +1,12 @@
-package com.example.dayplanner;
+package com.example.dayplanner.CustomViews;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Rect;
-import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+
+import com.example.dayplanner.R;
 
 public class CircularProgressBar extends ProgressBar {
 
