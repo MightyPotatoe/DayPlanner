@@ -17,6 +17,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 public class FirstFragment extends Fragment {
 
+    private DatabaseHelper dbHelper;
 
     @Override
     public View onCreateView(
@@ -31,7 +32,12 @@ public class FirstFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        dbHelper = new DatabaseHelper(getContext());
+
+
         LinearLayout contentLayout = view.findViewById(R.id.contentLayout);
+
+
 
         /*RelativeLayout graphlayout = view.findViewById(R.id.graphLayout);
         LinearLayout legendLayout = view.findViewById(R.id.legendLayout);

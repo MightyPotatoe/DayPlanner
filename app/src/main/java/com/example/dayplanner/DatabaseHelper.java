@@ -4,11 +4,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Paint;
 
 import androidx.annotation.Nullable;
 
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,10 +25,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DURATION_COL = "DURATION"; //nazwa kolumny 5
     private static final String CATEGORY_COL = "CATEGORY"; //nazwa kolumny 6
 
+    public static final int ACTIVITIES_TABLE_ID_COL_INDEX = 0;
+    public static final int ACTIVITIES_TABLE_DAY_OF_WEEK_COL_INDEX = 1;
+    public static final int ACTIVITIES_TABLE_ACTIVITY_NAME_INDEX = 2;
+    public static final int ACTIVITIES_TABLE_START_HOUR_COL_INDEX = 3;
+    public static final int ACTIVITIES_TABLE_END_HOUR_COL_INDEX = 4;
+    public static final int ACTIVITIES_TABLE_DURATION_COL_INDEX = 5;
+    public static final int ACTIVITIES_TABLE_CATEGORY_COL_INDEX = 6;
+
+
     //Tabela kategorii
     private static final String CATEGORIES_TABLE_NAME = "CATEGORIES_TABLE"; //nazwa tabeli w BD
     private static final String CATEGORY_NAME_COL = "CATEGORY_NAME"; //nazwa kolumny 1
     private static final String CATEGORY_ICON_ID = "CATEGORY_ICON_ID"; //nazwa kolumny 2
+    private static final String CATEGORY_COLOR = "CATEGORY_COLOR"; //nazwa kolumny 3
+
+    public static final int CATEGORIES_TABLE_ID_COL_INDEX = 0;
+    public static final int CATEGORIES_TABLE_CATEGORY_NAME_COL_INDEX = 1;
+    public static final int CATEGORIES_TABLE_CATEGORY_ICON_ID_INDEX = 2;
+    public static final int CATEGORIES_TABLE_CATEGORY_COLOR_INDEX = 3;
+
 
     /**
      * Konstruktor klasy DatabaseHelper
@@ -55,6 +71,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * CATEGORIES_TABLE
      * CATEGORY_NAME
      * CATEGORY_ICON_ID
+     *
+     * * uzupełnia tabelę kategorii wartościami domyślnymi
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -71,14 +89,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         final String CREATE_CATEGORY_TABLE = "create table " + CATEGORIES_TABLE_NAME + " ("
                 + ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + CATEGORY_NAME_COL + " STRING, "
-                + CATEGORY_ICON_ID + " INTEGER)";
+                + CATEGORY_ICON_ID + " INTEGER,"
+                + CATEGORY_COLOR + " STRING)";
 
 
         db.execSQL(CREATE_ACTIVITIES_TABLE);
         db.execSQL(CREATE_CATEGORY_TABLE);
-        db.close();
-    }
 
+        //Uzupełnienie tabeli wartościami domyślnymi
+        ArrayList<Category> basicCategoriesList = new BasicCategories().getCategoriesList();
+        for(Category category: basicCategoriesList){
+            insertCategoryToDB(category, db);
+        }
+    }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + CATEGORIES_TABLE_NAME);
@@ -86,6 +109,65 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    /**
+     * Wstawia wartości do bazy CATEGORY
+     * @param category - kategoria
+     * @return - true - wartość wstawiona popwawnie
+     * false - nie udało się wstawić wartości
+     */
+    public boolean insertCategoryToDB(Category category){
+        SQLiteDatabase db = this.getWritableDatabase();
+        if(!checkIfCategoryExists(category)){
+            return insertCategoryToDB(category, db);
+        }
+        else {
+            return false;
+        }
+
+    }
+    public boolean insertCategoryToDB(Category category, SQLiteDatabase db){
+            final String SQL = "INSERT INTO "+CATEGORIES_TABLE_NAME+"("+CATEGORY_NAME_COL+","+CATEGORY_ICON_ID+","+CATEGORY_COLOR+") VALUES ('"+category.NAME.toUpperCase()+"', '"+category.ICON_ID+"', '"+category.COLOR+"')";
+            db.execSQL(SQL);
+            //Sprawdzenie czy wartość została dodana
+            final String SQL_CHECK = "SELECT * FROM " + CATEGORIES_TABLE_NAME + "\n" +
+                    "WHERE " + CATEGORY_NAME_COL + " = '" + category.NAME.toUpperCase() + "'\n" +
+                    "AND " + CATEGORY_ICON_ID + " = '" + category.ICON_ID + "'\n" +
+                    "AND " + CATEGORY_COLOR + " = '" + category.COLOR + "'";
+        Cursor cursor = db.rawQuery(SQL_CHECK, null);
+        if(cursor.moveToNext()){
+            cursor.close();
+            return true;
+        }
+        else{
+            cursor.close();
+            return false;
+        }
+    }
+
+    /**
+     * Sprawdza czy kategoria znajduje się już w bazie
+     * @param category - kategoria
+     * @return true - kategoria nie występuje w bazie (Żaden z paramrtrów nie jest duplikatem)
+     * false - przynajmniej jeden parametr jest duplikatem
+     */
+    public boolean checkIfCategoryExists(Category category){
+        final String SQL_QUERY = "SELECT * FROM " + CATEGORIES_TABLE_NAME + "\n" +
+                "WHERE " + CATEGORY_NAME_COL + " = '" + category.NAME.toUpperCase() + "'\n" +
+                "OR " + CATEGORY_ICON_ID + " = '" + category.ICON_ID + "'\n" +
+                "OR " + CATEGORY_COLOR + " = '" + category.COLOR + "'";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(SQL_QUERY, null);
+        if(cursor.moveToNext()){
+            cursor.close();
+            return true;
+        }
+        else{
+            cursor.close();
+            return false;
+        }
+    }
+
+    //-------------NIETESTOWANE------------------------
     /**
      * Dodawanie wpisu do bazy danych
      */
@@ -101,6 +183,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
+
+
+
+    //-------------WERYFIKACJIA FORMATU---------------------
     /**
      * Sprawdza czy podany dzień[String] odpowiada przedziałowi pn-nd
      * @param dayOfWeek - Dzien tygodnia [String]
@@ -142,192 +228,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
-    
-
-
-
-
-
-
-
-    public String getCategoryNameFromCategoryDB(String categoryName){
-        SQLiteDatabase db = this.getWritableDatabase();
+    public Cursor getCategoryFromCategoryDB(String categoryName){
+        SQLiteDatabase db = this.getReadableDatabase();
         final String SQL_QUERY = "SELECT * FROM " + CATEGORIES_TABLE_NAME +
                 " WHERE "+CATEGORY_NAME_COL+" = '"+categoryName+"'";
         Cursor cursor = db.rawQuery(SQL_QUERY, null);
         if(cursor.moveToNext()){
-            String result = cursor.getString(1);
+            return cursor;
+        }
+        else{
             cursor.close();
-            return result;
-        }
-        return null;
-    }
-
-
-
-//-----------------------------------------------------------------------------------------------------------------------------------------
-   /* *//**
-     * Pobiera liczbe godzin przepracowanych danego dnia
-     * @param date_yyyy_MM_dd - data z której zostanie zliczona suma godzin pracy
-     * @return liczba godzin przepracowanych danego dnia
-     *//*
-    public int getHoursWorkedByDay(String date_yyyy_MM_dd){
-        //--Inicjowanie bazy danych
-        SQLiteDatabase db = this.getWritableDatabase();
-        //--Zwrocenie sumy przepracowanych godzin dnia dzisiejszego
-        final String SQL_QUERY = "SELECT SUM("+TIME_WORKED_COL+") " +
-                "FROM "+TABLE_NAME+" " +
-                "WHERE "+DATE_COL+" = '"+date_yyyy_MM_dd+"'";
-        Cursor cursor = db.rawQuery(SQL_QUERY, null);
-        if(cursor.moveToNext()){
-            int result = cursor.getInt(0);
-            cursor.close();
-            return result;
-        }
-        return 0;
-    }
-
-    *//**
-     *Usuwa wszystkie rekordy z bazy danych working_hours z podanego dnia
-     * @param date_yyyy_MM_dd - data w formacie yyyy-MM-dd
-     *//*
-    public void deleteAllRecordsFromTheDay(String date_yyyy_MM_dd){
-        //--Inicjowanie bazy danych
-        SQLiteDatabase db = this.getWritableDatabase();
-        final String SQL_QUERY = "DELETE FROM "+TABLE_NAME+
-                " WHERE "+DATE_COL+" = '"+date_yyyy_MM_dd+"'";
-        db.execSQL(SQL_QUERY);
-    }
-
-    *//**
-     * Dodanie nowego wiersza do bazy danych working_hours
-     *
-     * @param date_yyyyMMdd - dzien dodania
-     * @param timeStart_HHmm - czas rozpoczecia sesji
-     * @param timeEnd_HHmm - czas zakonczenia sesji
-     * @param timeWorkedInMinutes - czas przepracowanyu w sesji w minutach
-     * @return true/false
-     *//*
-    public void insertHolidayToHolidayTable(String date_yyyyMMdd, String timeStart_HHmm, String timeEnd_HHmm, int timeWorkedInMinutes) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            final String SQL_QUERY = "INSERT INTO " + TABLE_NAME +
-                    "(" + DATE_COL + ", " + START_HOUR_COL +", " + END_HOUR_COL +", " + TIME_WORKED_COL + ")" +
-                    "VALUES('" + date_yyyyMMdd + "', '" + timeStart_HHmm +"', '" + timeEnd_HHmm +"', '" + timeWorkedInMinutes + "')";
-            db.execSQL(SQL_QUERY);
-    }
-
-
-    *//**
-     * Pobranie godziny rozpoczęcia pierwszej sesji w danym dniu
-     * @param date_yyyy_MM_dd - data w formacie yyyy-MM-dd
-     * @return
-     *//*
-    public String getStartHourOfDate(String date_yyyy_MM_dd){
-        //--Inicjowanie bazy danych
-        SQLiteDatabase db = this.getWritableDatabase();
-        //--Zwrocenie ostatniej otwartej sesji
-        final String SQL_QUERY = "SELECT * from "+TABLE_NAME+" where "+DATE_COL+" = '"+date_yyyy_MM_dd+"' ORDER BY "+START_HOUR_COL+" ASC;";
-        Cursor cursor = db.rawQuery(SQL_QUERY, null);
-        if(cursor.moveToNext()){
-            return cursor.getString(2);
-        }
-        return null;
-    }
-
-    *//**
-     * Pobranie godziny rozpoczęcia ostatniej sesji w danym dniu
-     * @param date_yyyy_MM_dd - data w formacie yyyy-MM-dd
-     * @return
-     *//*
-    public String getLastSessionStartHourOfDate(String date_yyyy_MM_dd){
-        //--Inicjowanie bazy danych
-        SQLiteDatabase db = this.getWritableDatabase();
-        //--Zwrocenie ostatniej otwartej sesji
-        final String SQL_QUERY = "SELECT * from "+TABLE_NAME+" where "+DATE_COL+" = '"+date_yyyy_MM_dd+"' ORDER BY "+START_HOUR_COL+" DESC;";
-        Cursor cursor = db.rawQuery(SQL_QUERY, null);
-        if(cursor.moveToNext()){
-            String result = cursor.getString(2);
-            cursor.close();
-            System.out.println("Pobrałem z bazy " + TABLE_NAME + " ostatnią godzinę rozpoczęcia pracy: " + result);
-            return result;
-        }
-        return null;
-    }
-
-    public void printRecordsFromDay(String date_yyyy_MM_dd){
-        //--Inicjowanie bazy danych
-        SQLiteDatabase db = this.getWritableDatabase();
-        //--Zwrocenie wszystkich wartosci
-        final String SQL_QUERY = "SELECT * from "+TABLE_NAME+" where "+DATE_COL+" = '"+date_yyyy_MM_dd+"' ORDER BY "+START_HOUR_COL+" DESC;";
-        Cursor cursor = db.rawQuery(SQL_QUERY, null);
-        while(cursor.moveToNext()){
-            System.out.println("ID: " + cursor.getString(0) + " | DATE: " + cursor.getString(1) + " | START_HOUR: " +
-                    cursor.getString(2) + " | END_HOUR " + cursor.getString(3) + " | TIME_WORKED: " + cursor.getString(4));
-        }
-        cursor.close();
-    }
-
-    //----------------HOLIDAY DB-------------------
-    *//**
-     * Pobiera nazwę święta z dnia podanego jako paramter
-     *
-     * @param date_yyyyMMdd - data w formacie yyyy-MM-dd
-     * @return String - nazwa święta
-     *//*
-    public String getHolidayName(String date_yyyyMMdd) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT " + HOLIDAY_NAME +
-                " FROM " + HOLIDAYS_TABLE_NAME + "" +
-                " WHERE " + HOLIDAYS_DATE_COL + " = '" + date_yyyyMMdd + "'", null);
-        if (!cursor.moveToNext()) {
             return null;
         }
-        String result = cursor.getString(0);
-        cursor.close();
-        db.close();
-        return result;
     }
-
-    *//**
-     * Sprawdza czy w dacie podanej jako argument występuje jakieś święto
-     *
-     * @param date_yyyyMMdd - data w formacie yyyy-MM-dd
-     * @return true/false
-     *//*
-    public boolean isDayHoliday(String date_yyyyMMdd) {
-        String holidayName = getHolidayName(date_yyyyMMdd);
-        return holidayName != null;
-    }
-
-    *//**
-     * Dodanie nowego święta do bazy danych
-     *
-     * @param date_yyyyMMdd - dzien dodania
-     * @param holidayName   - nazwa swieta
-     * @return true/false
-     *//*
-    public boolean insertHolidayToHolidayTable(String date_yyyyMMdd, String holidayName) {
-        if (!isDayHoliday(date_yyyyMMdd)) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            final String SQL_QUERY = "INSERT INTO " + HOLIDAYS_TABLE_NAME +
-                    "(" + HOLIDAYS_DATE_COL + ", " + HOLIDAY_NAME + ")" +
-                    "VALUES('" + date_yyyyMMdd + "', '" + holidayName + "')";
-            db.execSQL(SQL_QUERY);
-            return true;
-        } else return false;
-    }
-
-    *//**
-     * Dodanie nowego święta do bazy danych
-     *
-     * @param date_yyyyMMdd - dzien dodania
-     *//*
-    public void deleteHolidayFromHolidayTable(String date_yyyyMMdd) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        final String SQL_QUERY = "DELETE FROM " + HOLIDAYS_TABLE_NAME +
-                " WHERE " + HOLIDAYS_DATE_COL + "= '" + date_yyyyMMdd + "'";
-        System.out.println("Executing SQL_QUERY: " + SQL_QUERY);
-        db.execSQL(SQL_QUERY);
-    }*/
 
 }

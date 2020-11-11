@@ -16,19 +16,7 @@
         <item name="colorOnError">@color/my_app_color_on_error</item>
         <item name="colorOnSurface">@color/my_app_color_on_surface</item>
         <item name="scrimBackground" tools:ignore="PrivateResource">@color/mtrl_scrim_color</item>
-        <item name="textAppearanceHeadline1">@style/TextAppearance.MaterialComponents.Headline1</item>
-        <item name="textAppearanceHeadline2">@style/TextAppearance.MaterialComponents.Headline2</item>
-        <item name="textAppearanceHeadline3">@style/TextAppearance.MaterialComponents.Headline3</item>
-        <item name="textAppearanceHeadline4">@style/TextAppearance.MaterialComponents.Headline4</item>
-        <item name="textAppearanceHeadline5">@style/TextAppearance.MaterialComponents.Headline5</item>
-        <item name="textAppearanceHeadline6">@style/TextAppearance.MaterialComponents.Headline6</item>
-        <item name="textAppearanceSubtitle1">@style/TextAppearance.MaterialComponents.Subtitle1</item>
-        <item name="textAppearanceSubtitle2">@style/TextAppearance.MaterialComponents.Subtitle2</item>
-        <item name="textAppearanceBody1">@style/TextAppearance.MaterialComponents.Body1</item>
-        <item name="textAppearanceBody2">@style/TextAppearance.MaterialComponents.Body2</item>
-        <item name="textAppearanceCaption">@style/TextAppearance.MaterialComponents.Caption</item>
-        <item name="textAppearanceButton">@style/TextAppearance.MaterialComponents.Button</item>
-        <item name="textAppearanceOverline">@style/TextAppearance.MaterialComponents.Overline</item>
+
     </style>
 
 
@@ -43,5 +31,72 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+     <style name="TextAppearance.MdcTypographyStyles.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
+            <item name="fontFamily">@font/open_sans_light</item>
+            <item name="android:fontFamily">@font/open_sans_light</item>
+            <item name="android:textSize">95sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
+            <item name="fontFamily">@font/open_sans_light</item>
+            <item name="android:fontFamily">@font/open_sans_light</item>
+            <item name="android:textSize">59sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Headline3" parent="TextAppearance.MaterialComponents.Headline3">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">48sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">34sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">24sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">20sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">16sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">14sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Body1" parent="TextAppearance.MaterialComponents.Body1">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">16sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Body2" parent="TextAppearance.MaterialComponents.Body2">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">14sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Button" parent="TextAppearance.MaterialComponents.Button">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">14sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Caption" parent="TextAppearance.MaterialComponents.Caption">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">12sp</item>
+        </style>
+        <style name="TextAppearance.MdcTypographyStyles.Overline" parent="TextAppearance.MaterialComponents.Overline">
+            <item name="fontFamily">@font/open_sans_regular</item>
+            <item name="android:fontFamily">@font/open_sans_regular</item>
+            <item name="android:textSize">10sp</item>
+        </style>
 
 </resources>
