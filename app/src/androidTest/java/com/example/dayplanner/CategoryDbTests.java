@@ -34,7 +34,7 @@ public class CategoryDbTests {
     private MainActivity mainActivity = null;
 
     @Before
-    public void setUp() throws InterruptedException {
+    public void setUp(){
         mainActivity = mainActivityActivityTestRule.getActivity();
         mainActivity.getApplicationContext().deleteDatabase("day_planner_db");
         mainActivity = mainActivityActivityTestRule.getActivity();
@@ -59,7 +59,7 @@ public class CategoryDbTests {
      * 2) Sprawdzenie czy baza została wypełniona wartościami domyślnymi
      */
     @Test()
-    public void InicjalizowanieBazyDanych() throws InterruptedException {
+    public void InicjalizowanieBazyDanych(){
         final AppDatabase db = AppDatabase.getInstance(mainActivity.getBaseContext());
 
         //Sprawdzenie czy wszystkie pola zostały spredefiniowane w bazie
