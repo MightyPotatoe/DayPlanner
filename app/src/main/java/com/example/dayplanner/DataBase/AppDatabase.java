@@ -10,12 +10,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import java.util.concurrent.Executors;
 
-@Database(entities = {Category.class}, version = 1)
+@Database(entities = {Category.class, ScheduledActivity.class},  version = 1)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
 
     public abstract CategoryDao categoryDao();
+    public abstract ScheduledActivityDao scheduledActivityDao();
 
     public synchronized static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
@@ -44,11 +45,13 @@ public abstract class AppDatabase extends RoomDatabase {
                             @Override
                             public void run() {
                                 getInstance(context).categoryDao().insertAll(Category.populateData());
+                                getInstance(context).scheduledActivityDao().insertAll(ScheduledActivity.populateData());
                             }
                         });
                     }
                 })
                 .build();
     }
+
 
 }

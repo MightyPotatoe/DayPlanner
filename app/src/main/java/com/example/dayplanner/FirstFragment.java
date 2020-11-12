@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.example.dayplanner.CustomViews.SingleActionElement;
 import com.example.dayplanner.CustomViews.TimeEventElement;
 import com.example.dayplanner.DataBase.AppDatabase;
-import com.example.dayplanner.DataBase.Category;
+import com.example.dayplanner.DataBase.ScheduledActivity;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,8 +42,6 @@ public class FirstFragment extends Fragment {
 
 
         LinearLayout contentLayout = view.findViewById(R.id.contentLayout);
-
-
 
 
         /*RelativeLayout graphlayout = view.findViewById(R.id.graphLayout);
@@ -128,7 +126,7 @@ public class FirstFragment extends Fragment {
             @Override
             public void run() {
                 final AppDatabase db = AppDatabase.getInstance(getContext());
-                Category found = db.categoryDao().findByName("work".toUpperCase());
+                ScheduledActivity found = db.scheduledActivityDao().findByName("Pobudka");
                 timeEventElement13.setActivityText(found.name);
             }
         });
