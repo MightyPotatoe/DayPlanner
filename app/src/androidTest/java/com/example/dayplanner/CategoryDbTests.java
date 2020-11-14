@@ -111,4 +111,18 @@ public class CategoryDbTests {
         assertEquals(1, db.categoryDao().checkForDuplicates(category.name, category.iconId, category.colorHex));
     }
 
+    @Test()
+    public void getCategoryByUid(){
+        final AppDatabase db = AppDatabase.getInstance(mainActivity.getBaseContext());
+
+        Category[] prepopulatedData = Category.populateData();
+        Assert.assertEquals(prepopulatedData[0], db.categoryDao().findByUid(1).get(0));
+        Assert.assertEquals(prepopulatedData[1], db.categoryDao().findByUid(1).get(1));
+        Assert.assertEquals(prepopulatedData[2], db.categoryDao().findByUid(1).get(2));
+        Assert.assertEquals(prepopulatedData[3], db.categoryDao().findByUid(1).get(3));
+
+    }
+
+
+
 }

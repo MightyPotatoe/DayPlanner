@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.example.dayplanner.Utilities.Conversions;
+
 import java.time.DayOfWeek;
 import java.util.Objects;
 
@@ -65,4 +67,11 @@ public class ScheduledActivity {
     public int hashCode() {
         return Objects.hash(name, dayOfWeek, startTime, endTime, categoryId);
     }
+
+    public boolean isSingular(){
+        return Conversions.hourToMinutes(endTime) - Conversions.hourToMinutes(startTime) == 0;
+    }
+
+
+
 }

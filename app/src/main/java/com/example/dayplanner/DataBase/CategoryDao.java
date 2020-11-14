@@ -16,10 +16,13 @@ public interface CategoryDao {
     @Query("SELECT * FROM Category")
     List<Category> getAll();
 
-    @Query("SELECT * FROM Category WHERE category_name = :categoryName LIMIT 1")
+    @Query("SELECT * FROM Category WHERE category_name LIKE :categoryName LIMIT 1")
     Category findByName(String categoryName);
 
-    @Query("SELECT COUNT(*) FROM CATEGORY WHERE category_name = :categoryName OR icon_id = :iconId OR color_hex = :colorHex")
+    @Query("SELECT * FROM Category WHERE uid = :categoryId")
+    List<Category> findByUid(int categoryId);
+
+    @Query("SELECT COUNT(*) FROM CATEGORY WHERE category_name LIKE :categoryName OR icon_id LIKE :iconId OR color_hex LIKE :colorHex")
     int checkForDuplicates(String categoryName, int iconId, String colorHex);
 
     @Insert

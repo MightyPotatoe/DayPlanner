@@ -82,4 +82,33 @@ public class ScheduledActivityDbTests {
         Assert.assertEquals(scheduledActivity, db.scheduledActivityDao().findByName(scheduledActivity.name));
     }
 
+    //-----------------TEST 3------------------------------
+    //getActivitiesBetween(DAY, START, STOP)
+    @Test
+    public void WyszukanieWszystkichAktownysciWPrzedzialeCzasowym(){
+        final AppDatabase db = AppDatabase.getInstance(mainActivity.getBaseContext());
+        //Utworzenie danych w tabeli testowej - wtorek
+        ScheduledActivity[] list = new ScheduledActivity[10];
+        list[0] = new ScheduledActivity("Nazwa", DayOfWeek.TUESDAY.toString(), "06:00", "07:00", 1);
+        list[1] = new ScheduledActivity("Nazwa", DayOfWeek.TUESDAY.toString(), "07:00", "08:00", 1);
+        list[2] = new ScheduledActivity("Nazwa", DayOfWeek.TUESDAY.toString(), "08:00", "09:00", 1);
+        list[3] = new ScheduledActivity("Nazwa", DayOfWeek.TUESDAY.toString(), "09:00", "10:00", 1);
+        list[4] = new ScheduledActivity("Nazwa", DayOfWeek.TUESDAY.toString(), "10:00", "11:00", 1);
+        list[5] = new ScheduledActivity("Nazwa", DayOfWeek.TUESDAY.toString(), "11:00", "12:00", 1);
+        list[6] = new ScheduledActivity("Nazwa", DayOfWeek.TUESDAY.toString(), "12:00", "13:00", 1);
+        list[7] = new ScheduledActivity("Nazwa", DayOfWeek.TUESDAY.toString(), "13:00", "14:00", 1);
+        list[8] = new ScheduledActivity("Nazwa", DayOfWeek.TUESDAY.toString(), "14:00", "15:00", 1);
+        list[9] = new ScheduledActivity("Nazwa", DayOfWeek.TUESDAY.toString(), "15:00", "16:00", 1);
+
+
+        db.scheduledActivityDao().insertAll(list);
+
+        List<ScheduledActivity> result = db.scheduledActivityDao().getActivitiesBetween(DayOfWeek.TUESDAY.toString(), "09:00", "13:00");
+        Assert.assertEquals(result.get(0), list[3]);
+        Assert.assertEquals(result.get(1), list[4]);
+        Assert.assertEquals(result.get(2), list[5]);
+        Assert.assertEquals(result.get(3), list[6]);
+    }
+
+
 }

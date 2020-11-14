@@ -35,9 +35,9 @@ public abstract class VerificationMethods {
      * @return true: podana wartość spełnia warunki
      * false: podana wartość nie spełnia warunków
      */
-    public boolean isHourCorrect(String hour){
+    public static boolean isHourCorrect(String hour){
         System.out.println("Sprawdzam czy podano popaprawną godzinę..." );
-        String regexForTime = "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
+        String regexForTime = "^([0-1][0-9]|2[0-3]):[0-5][0-9]$";
         Pattern hourPattern = Pattern.compile(regexForTime);
         Matcher matcher = hourPattern.matcher(hour);
         if(matcher.matches()){
@@ -47,6 +47,7 @@ public abstract class VerificationMethods {
         System.out.println("Podana godzina: " + hour + " nie spełnia wymogów!");
         return false;
     }
+
 
 
 }

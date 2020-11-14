@@ -69,10 +69,31 @@ public class DataVerificationTests {
         Assert.assertFalse(VerificationMethods.isDayCorrect(DAY_OF_WEEK_INCORRECT_14));
         Assert.assertFalse(VerificationMethods.isDayCorrect(DAY_OF_WEEK_INCORRECT_15));
         Assert.assertFalse(VerificationMethods.isDayCorrect(DAY_OF_WEEK_INCORRECT_16));
-
-
-
-
-
     }
+
+    //Sprawdzenie poprawności godziny
+    @Test
+    public void SprawdzeniePoprawnosciGodziny() {
+        final String INCORRECT_VALUES[] = {"tojestString",
+                "12" ,
+                "1245",
+                "124566",
+                "12g38",
+                "00:72",
+                "24:15",
+                "13:90",
+                "24:00",
+                "1:30"};
+
+        final String CORECT_VALUS[] = {"00:00", "23:59", "16:12", "01:30", "13:30"};
+
+        for(String value: INCORRECT_VALUES){
+            Assert.assertFalse(VerificationMethods.isHourCorrect(value));
+        }
+        for(String value: CORECT_VALUS){
+            Assert.assertTrue(VerificationMethods.isHourCorrect(value));
+        }
+    }
+
+
 }
